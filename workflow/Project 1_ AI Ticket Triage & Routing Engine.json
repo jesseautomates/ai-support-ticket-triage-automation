@@ -1,0 +1,2449 @@
+{
+  "name": "Project 1: AI Ticket Triage & Routing Engine",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        16
+      ],
+      "id": "a1781968-4608-4400-b350-3b9feef74b1e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73374db4-85ba-4dd7-9d5d-cac6af72bed9",
+              "name": "=ticket_id",
+              "value": "={{$json.ticket_id}}",
+              "type": "string"
+            },
+            {
+              "id": "fb79932f-74d3-421e-a458-f28a522caf8f",
+              "name": "source_channel",
+              "value": "={{$json.source_channel}}",
+              "type": "string"
+            },
+            {
+              "id": "5982a561-5dda-4e73-b9d8-79b6ff418fb0",
+              "name": "customer_name",
+              "value": "={{$json.customer_name}}",
+              "type": "string"
+            },
+            {
+              "id": "d38e6b2d-80f5-4c38-8f39-b149fc3e886d",
+              "name": "customer_tier",
+              "value": "={{$json.customer_tier}}",
+              "type": "string"
+            },
+            {
+              "id": "53794ac2-8f3e-448c-b9e5-378b118ca870",
+              "name": "subject",
+              "value": "={{$json.subject}}",
+              "type": "string"
+            },
+            {
+              "id": "21a9a705-a300-4ae6-9ccb-f4baeedbe6d1",
+              "name": "description",
+              "value": "={{$json.description}}",
+              "type": "string"
+            },
+            {
+              "id": "9bbbe698-76c6-4cd6-a46f-9421549d72e3",
+              "name": "product_area",
+              "value": "={{$json.product_area}}",
+              "type": "string"
+            },
+            {
+              "id": "c41f756c-bb57-43ef-af04-024e3460e8ae",
+              "name": "current_priority",
+              "value": "={{$json.current_priority}}",
+              "type": "string"
+            },
+            {
+              "id": "c1b88e53-0825-4ada-9c5a-d78b7a87c677",
+              "name": "language",
+              "value": "={{$json.language}}",
+              "type": "string"
+            },
+            {
+              "id": "d86d4410-bc91-4814-ad70-1a1196e99e07",
+              "name": "attachments_present",
+              "value": "={{$json.attachments_present === true || $json.attachments_present === \"true\"}}",
+              "type": "boolean"
+            },
+            {
+              "id": "aebe532c-e090-41a6-bbf3-f62bb4cd1ed9",
+              "name": "ticket_text",
+              "value": "={{$json.subject + \" - \" + $json.description}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        16
+      ],
+      "id": "a16a4982-c14b-4506-a7f5-156cdaf1b63c",
+      "name": "Normalize Ticket Schema"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "972ee7cb-ad2a-4f98-9c5f-2ac93b4b55e9",
+              "name": "ai_category",
+              "value": "general_question",
+              "type": "string"
+            },
+            {
+              "id": "23a84fcf-1a92-4bdf-bedf-e97cce374113",
+              "name": "ai_urgency",
+              "value": "medium",
+              "type": "string"
+            },
+            {
+              "id": "97c79b73-eb89-4366-b6a4-c16ad978643c",
+              "name": "ai_sentiment",
+              "value": "neutral",
+              "type": "string"
+            },
+            {
+              "id": "36fee86b-8e12-443c-8039-84b82bafee99",
+              "name": "recommended_queue",
+              "value": "tier1_support",
+              "type": "string"
+            },
+            {
+              "id": "bd7a5572-4b3f-4a72-95f2-27b145723efa",
+              "name": "escalation_flag",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "7254eaf5-af18-4433-a275-f8c41e574281",
+              "name": "confidence_score",
+              "value": "0.25",
+              "type": "string"
+            },
+            {
+              "id": "9192c913-f3a4-44a2-a886-5450a8608591",
+              "name": "traige_reason",
+              "value": "Fallback applied because AI response was empty or invalid",
+              "type": "string"
+            },
+            {
+              "id": "cfef6679-3e1c-4f11-be99-303c7fa6a760",
+              "name": "fallback_applied",
+              "value": "true",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        112
+      ],
+      "id": "2880c741-4d62-4ac2-80b3-9e307f2a2030",
+      "name": "Apply Fallback Classification"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Tier 1 Support",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "830176d0-e695-4289-9d8a-e34ba79c80c1",
+              "name": "destination_system",
+              "value": "Zendesk Support Queue",
+              "type": "string"
+            },
+            {
+              "id": "e5a2c4b6-9162-404d-996f-0b308cc7d0b6",
+              "name": "delivery_action",
+              "value": "Assign to Tier 1 support queue",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        -464
+      ],
+      "id": "a1e32036-72c9-4e7f-8187-0af61e77268b",
+      "name": "Route Ticket -> Tier 1 Support"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "vip_flag": "={{ $json.vip_flag }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "priority_score": "={{ $json.priority_score }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        -464
+      ],
+      "id": "e1c6c6bc-a9f8-4120-a97c-5e724485c18a",
+      "name": "Log Tier 1 Routing Result",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Billing Operations",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "a0aef16d-b215-42df-a59b-1eb8c257d329",
+              "name": "destination_system",
+              "value": "Billing Queue",
+              "type": "string"
+            },
+            {
+              "id": "71219b0b-bada-497e-9666-068650c57218",
+              "name": "delivery_action",
+              "value": "Assign to Billing Operations queue",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        -272
+      ],
+      "id": "9664b237-45e5-4f75-a40b-3c5847f2fafe",
+      "name": "Route Ticket -> Billing Operations"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "priority_score": "={{ $json.priority_score }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "vip_flag": "={{ $json.vip_flag }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        -272
+      ],
+      "id": "987ae817-8c9b-4f70-946d-ce0412cc942c",
+      "name": "Log Billing Routing Result",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Technical Support",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "ddf5a8f5-ecbe-4052-aa25-9e02f351e841",
+              "name": "destination_system",
+              "value": "Jira Service Management",
+              "type": "string"
+            },
+            {
+              "id": "baea995b-ca24-4591-a2ca-70c16c758beb",
+              "name": "delivery_action",
+              "value": "Create technical review work item",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        -80
+      ],
+      "id": "e6b65117-f60f-49a4-a89e-0756667e3c65",
+      "name": "Route Ticket -> Technical Support"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "vip_flag": "={{ $json.vip_flag }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "priority_score": "={{ $json.priority_score }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        -80
+      ],
+      "id": "01146a4a-e973-4583-975c-9db4fe818c25",
+      "name": "Log Technical Support Routing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Product Feedback",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "fb442412-037b-4464-8592-2105b9ed06f3",
+              "name": "destination_system",
+              "value": "Product Intake Board",
+              "type": "string"
+            },
+            {
+              "id": "8dd504ad-2578-43c3-bcd1-93787e466a6a",
+              "name": "delivery_action",
+              "value": "Log feature request for product review",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        112
+      ],
+      "id": "3718005f-8ed6-41b3-a5b5-857b5e3d0cb0",
+      "name": "Route Ticket → Product Feedback"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "priority_score": "={{ $json.priority_score }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "vip_flag": "={{ $json.vip_flag }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        112
+      ],
+      "id": "ef95af0b-1c15-49ee-9e4f-1b4876e0c652",
+      "name": "Log Product Feedback Routing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Customer Success",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "bc09a17a-6df3-4a2a-ad93-c73dc6b2a39e",
+              "name": "destination_system",
+              "value": "CRM / CSM Queue",
+              "type": "string"
+            },
+            {
+              "id": "937ae8fa-647b-4461-9064-00110dc7ae31",
+              "name": "delivery_action",
+              "value": "Create customer success follow-up task",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        304
+      ],
+      "id": "69ea55af-4b70-4ad8-87e9-1a2715939175",
+      "name": "Route Ticket → Customer Success"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "priority_score": "={{ $json.priority_score }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "vip_flag": "={{ $json.vip_flag }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        304
+      ],
+      "id": "1ce35416-c58f-4d1f-860b-a524ed07f279",
+      "name": "Log Customer Success Routing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ba0280d-2e48-4a13-93ed-8a4a708ec163",
+              "name": "assigned_team",
+              "value": "Urgent Escalations",
+              "type": "string"
+            },
+            {
+              "id": "dc758248-f386-4c14-9441-b273cf40203b",
+              "name": "processed_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "e44ddd60-2e2a-4dc9-a566-d2f199ba09c9",
+              "name": "destination_system",
+              "value": "Incident Escalation Process",
+              "type": "string"
+            },
+            {
+              "id": "5720c416-86c0-4d89-8d18-8fc9bac26098",
+              "name": "delivery_action",
+              "value": "Trigger urgent escalation workflow",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        496
+      ],
+      "id": "4db28d43-c658-4fdf-9031-2ae0e075fecc",
+      "name": "Route Ticket → Urgent Escalation"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1989984076,
+          "mode": "list",
+          "cachedResultName": "Triage Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=1989984076"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_tier": "={{ $json.customer_tier }}",
+            "subject": "={{ $json.subject }}",
+            "product_area": "={{ $json.product_area }}",
+            "ai_category": "={{ $json.ai_category }}",
+            "ai_urgency": "={{ $json.ai_urgency }}",
+            "ai_sentiment": "={{ $json.ai_sentiment }}",
+            "recommended_queue": "={{ $json.recommended_queue }}",
+            "escalation_flag": "={{ $json.escalation_flag }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "triage_reason": "={{ $json.triage_reason }}",
+            "fallback_applied": "={{ $json.fallback_applied ?? false }}",
+            "processed_at": "={{ $json.processed_at }}",
+            "assigned_team": "={{ $json.assigned_team }}",
+            "delivery_action": "={{ $json.delivery_action }}",
+            "destination_system": "={{ $json.destination_system }}",
+            "vip_flag": "={{ $json.vip_flag }}",
+            "sla_risk": "={{ $json.sla_risk }}",
+            "priority_score": "={{ $json.priority_score }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_tier",
+              "displayName": "customer_tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_category",
+              "displayName": "ai_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_urgency",
+              "displayName": "ai_urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_queue",
+              "displayName": "recommended_queue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "escalation_flag",
+              "displayName": "escalation_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_score",
+              "displayName": "confidence_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "triage_reason",
+              "displayName": "triage_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fallback_applied",
+              "displayName": "fallback_applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_team",
+              "displayName": "assigned_team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destination_system",
+              "displayName": "destination_system",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_action",
+              "displayName": "delivery_action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vip_flag",
+              "displayName": "vip_flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_risk",
+              "displayName": "sla_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_score",
+              "displayName": "priority_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        496
+      ],
+      "id": "9d14310e-ffa0-4247-b30e-2c0baeb7428f",
+      "name": "Log Escalation Routing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MzCSCFw4BA1CmiD6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ",
+          "mode": "list",
+          "cachedResultName": "Dummy Data - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IyvsPJy2FyqY3jXaXNNeVGxQybi-7bZhoH6u-VPJcdQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        16
+      ],
+      "id": "b52b86ae-dfc5-42bd-a2a7-96872a381c51",
+      "name": "Load Ticket Dataset",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7538W7QmzxjEcjhc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an AI support operations triage assistant.\n\nYour job is to classify support tickets for routing.\n\nYou MUST choose ONLY from the allowed values below.\n\nAllowed ai_category values:\nlogin_access\nbilling_payment\nbug_report\nfeature_request\nintegration_api\nperformance_issue\naccount_management\ngeneral_question\n\nAllowed ai_urgency values:\nlow\nmedium\nhigh\ncritical\n\nAllowed ai_sentiment values:\npositive\nneutral\nnegative\nfrustrated\n\nAllowed recommended_queue values:\ntier1_support\nbilling_ops\ntechnical_support\nproduct_feedback\ncustomer_success\nurgent_escalations\n\nEscalation rules:\nSet escalation_flag to true if:\n- the issue affects multiple users\n- the system may be down\n- it involves authentication failures for enterprise customers\n- it blocks business operations\n\nOtherwise set escalation_flag to false.\n\nReturn ONLY JSON.\n\nJSON format:\n{\n\"ai_category\": \"\",\n\"ai_urgency\": \"\",\n\"ai_sentiment\": \"\",\n\"recommended_queue\": \"\",\n\"escalation_flag\": false,\n\"confidence_score\": 0.0,\n\"triage_reason\": \"\"\n}\n\nTicket text:\n{{$json.ticket_text}}\n\nCustomer tier:\n{{$json.customer_tier}}\n\nProduct area:\n{{$json.product_area}}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        16
+      ],
+      "id": "4eb42557-6a99-4c16-854a-f0d0e025271f",
+      "name": "AI Ticket Classification",
+      "credentials": {
+        "openAiApi": {
+          "id": "02urts7MP8qEb2Bv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cba83760-60fe-42a0-8b5b-aa547eec9c21",
+              "leftValue": "={{ $json.output?.[0]?.content?.[0]?.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "e9deeb60-10e2-4870-af5b-20bd243636e4",
+      "name": "Check AI Response Validity"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const text = $json.output?.[0]?.content?.[0]?.text ?? \"\";\n\nconst cleaned = text\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (error) {\n  parsed = {\n    ai_category: \"general_question\",\n    ai_urgency: \"medium\",\n    ai_sentiment: \"neutral\",\n    recommended_queue: \"tier1_support\",\n    escalation_flag: false,\n    confidence_score: 0.25,\n    triage_reason: \"Fallback applied because AI returned invalid JSON\",\n    fallback_applied: true\n  };\n}\n\nreturn {\n  json: {\n    ...$json,\n    ...parsed\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -80
+      ],
+      "id": "1a971ba6-43ed-437c-824e-f282204dc975",
+      "name": "Parse AI Classification JSON"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1488,
+        16
+      ],
+      "id": "4c05cd7b-f37c-492d-a511-15b5d938d06d",
+      "name": "Merge Valid + Fallback Tickets"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "tier1_support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f78ca782-3dd0-4c99-8c3d-754e7e839c78"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Tier 1 Support"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e2a423d3-6b93-489b-90fd-689247949a5e",
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "billing_ops",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Billing Operations"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2a7b8945-5a25-4483-820d-6b23aefc5ddd",
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "technical_support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Technical Support"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bb7355a9-cfe7-409d-b89b-f171eb8b894d",
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "product_feedback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Product Feedback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1d812890-3b08-413f-ba21-2ed174e89200",
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "customer_success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Customer Success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "06971f82-79ed-4894-b531-3b4acac082d2",
+                    "leftValue": "={{$json.recommended_queue}}",
+                    "rightValue": "urgent_escalations",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Urgent Escalations"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1936,
+        -48
+      ],
+      "id": "08bf7bba-dca9-4b53-95e1-54551ce37c5a",
+      "name": "Route Ticket by AI Queue"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const urgency = $json.ai_urgency;\nconst isEnterprise = $json.customer_tier === \"enterprise\";\nconst escalation = $json.escalation_flag === true;\n\n// VIP flag\nconst vip_flag = isEnterprise;\n\n// SLA risk calculation\nlet sla_risk = \"low\";\n\nif (urgency === \"critical\" || escalation) {\n  sla_risk = \"high\";\n} else if (urgency === \"high\") {\n  sla_risk = \"medium\";\n}\n\n// Priority scoring\nlet priority_score = 30;\n\nif (urgency === \"critical\") {\n  priority_score = 100;\n} else if (escalation) {\n  priority_score = 90;\n} else if (urgency === \"high\") {\n  priority_score = 80;\n} else if (urgency === \"medium\") {\n  priority_score = 60;\n}\n\n// Enterprise customers get a boost\nif (vip_flag) {\n  priority_score += 10;\n}\n\nif (priority_score > 100) {\n  priority_score = 100;\n}\n\nreturn {\n  json: {\n    ...$json,\n    vip_flag,\n    sla_risk,\n    priority_score\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        16
+      ],
+      "id": "9f2a6c55-fa00-4f66-9f49-16741e8dce04",
+      "name": "Enrich Ticket Priority"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Load Ticket Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Ticket Schema": {
+      "main": [
+        [
+          {
+            "node": "AI Ticket Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Fallback Classification": {
+      "main": [
+        [
+          {
+            "node": "Merge Valid + Fallback Tickets",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Route Ticket -> Tier 1 Support": {
+      "main": [
+        [
+          {
+            "node": "Log Tier 1 Routing Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket -> Billing Operations": {
+      "main": [
+        [
+          {
+            "node": "Log Billing Routing Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket -> Technical Support": {
+      "main": [
+        [
+          {
+            "node": "Log Technical Support Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket → Product Feedback": {
+      "main": [
+        [
+          {
+            "node": "Log Product Feedback Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket → Customer Success": {
+      "main": [
+        [
+          {
+            "node": "Log Customer Success Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket → Urgent Escalation": {
+      "main": [
+        [
+          {
+            "node": "Log Escalation Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Ticket Dataset": {
+      "main": [
+        [
+          {
+            "node": "Normalize Ticket Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Ticket Classification": {
+      "main": [
+        [
+          {
+            "node": "Check AI Response Validity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check AI Response Validity": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Classification JSON",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Apply Fallback Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Classification JSON": {
+      "main": [
+        [
+          {
+            "node": "Merge Valid + Fallback Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Valid + Fallback Tickets": {
+      "main": [
+        [
+          {
+            "node": "Enrich Ticket Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Ticket by AI Queue": {
+      "main": [
+        [
+          {
+            "node": "Route Ticket -> Tier 1 Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Ticket -> Billing Operations",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Ticket -> Technical Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Ticket → Product Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Ticket → Customer Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Ticket → Urgent Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Ticket Priority": {
+      "main": [
+        [
+          {
+            "node": "Route Ticket by AI Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5bbbcdae-d23d-49eb-b196-7e1c032236dc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8c564f8a0e31d2d9b4fd48f9261cd4e6e8feb7773a62513d98d76af53489a99a"
+  },
+  "id": "tstxHSYDg6UZxGpe",
+  "tags": []
+}
