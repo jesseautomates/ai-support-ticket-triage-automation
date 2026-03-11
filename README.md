@@ -10,7 +10,7 @@ Built using **n8n**, **OpenAI**, and **Google Sheets**.
 
 ## Architecture
 
-![Architecture](images/architecture-diagram.png)
+[![Architecture](images/architecture-diagram.png)](https://github.com/jesseautomates/ai-support-ticket-triage-automation/blob/main/workflow/data/images/architecture-diagram.png)
 
 ---
 
