@@ -107,3 +107,5 @@ This prototype could be extended with real integrations such as:
 
 * Jira
 * Zendesk
+
+Next Project: [AI Support Escalation Risk Detection] https://github.com/jesseautomates/ai-support-escalation-risk-detection
